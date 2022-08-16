@@ -59,11 +59,11 @@ const CrudSexo = () => {
     const saveProduct = () => {
         setSubmitted(true);
 
-        if (sexos.nombre.trim()) {
+        if (sexo.nombre.trim()) {
             let _products = [...sexos];
-            let _product = { ...sexos };
-            if (sexos.id) {
-                const index = findIndexById(sexos.id);
+            let _product = { ...sexo };
+            if (sexo.id) {
+                const index = findIndexById(sexo.id);
 
                 _products[index] = _product;
                 const sexoservice = new SexoService();
@@ -263,7 +263,7 @@ const CrudSexo = () => {
                                 required
                                 autoFocus
                                 className={classNames({
-                                    "p-invalid": submitted && !sexos.nombre,
+                                    "p-invalid": submitted && !sexos.nombre
                                 })}
                             />
                             {submitted && !sexos.nombre && <small className="p-invalid">El nombre es requerido.</small>}

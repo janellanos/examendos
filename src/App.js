@@ -149,6 +149,7 @@ const App = () => {
                 { label: 'Provincia', icon: 'pi pi-fw pi-user-edit', to: '/crud-provincia' },
                 { label: 'Ciudad', icon: 'pi pi-fw pi-user-edit', to: '/crud-cuidad' },
                 { label: 'Sexo', icon: 'pi pi-fw pi-user-edit', to: '/crud-sexo' },
+                { label: 'Votante', icon: 'pi pi-fw pi-user-edit', to: '/crud-candidato' },
             ]
         },
             ];
@@ -195,6 +196,7 @@ const App = () => {
                     <Route path="/crud-provincia" component={Crud} />
                     <Route path="/crud-cuidad" component={CrudCuidad} />
                     <Route path="/crud-sexo" component={CrudSexo} />
+                    <Route path="/crud-votante" component={CrudSexo} />
                 </div>
 
                 <AppFooter layoutColorMode={layoutColorMode} />
