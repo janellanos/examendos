@@ -69,7 +69,7 @@ const Crud = () => {
 
         if (product.nombre.trim()) {
             let _products = [...products];
-            let _product = { ...product };
+            let _product = { ...product};
             if (product.id) {
                 const index = findIndexById(product.id);
 
