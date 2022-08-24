@@ -224,6 +224,15 @@ const CrudCuidad = () => {
         );
     };
 
+    const provBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Name</span>
+                {rowData.provincia.nombre}
+            </>
+        );
+    };
+
     const imageBodyTemplate = (rowData) => {
         return (
             <>
@@ -333,7 +342,7 @@ const CrudCuidad = () => {
                         <Column selectionMode="multiple" headerStyle={{ width: "3rem" }}></Column>
                         <Column field="code" header="Id" body={codeBodyTemplate} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
                         <Column field="name" header="Nombre Cuidad" body={nameBodyTemplate} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
-                        <Column field="name" header="Nombre Provincia" body={nameBodyTemplate} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
+                        <Column field="name" header="Nombre Provincia" body={provBodyTemplate} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
                         <Column body={actionBodyTemplate}></Column>
                     </DataTable>
 

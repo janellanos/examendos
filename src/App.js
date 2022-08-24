@@ -13,6 +13,7 @@ import Dashboard from './components/Dashboard';
 import Crud from './pages/Crud';
 import CrudCuidad from './pages/CrudCuidad'
 import CrudSexo from './pages/CrudSexo';
+import CrudVotantes from './pages/CrudVotantes';
 
 import PrimeReact from 'primereact/api';
 import { Tooltip } from 'primereact/tooltip';
@@ -25,6 +26,7 @@ import './assets/demo/flags/flags.css';
 import './assets/demo/Demos.scss';
 import './assets/layout/layout.scss';
 import './App.scss';
+
 
 const App = () => {
     const [layoutMode, setLayoutMode] = useState('static');
@@ -149,7 +151,7 @@ const App = () => {
                 { label: 'Provincia', icon: 'pi pi-fw pi-user-edit', to: '/crud-provincia' },
                 { label: 'Ciudad', icon: 'pi pi-fw pi-user-edit', to: '/crud-cuidad' },
                 { label: 'Sexo', icon: 'pi pi-fw pi-user-edit', to: '/crud-sexo' },
-                { label: 'Votante', icon: 'pi pi-fw pi-user-edit', to: '/crud-candidato' },
+                { label: 'Votante', icon: 'pi pi-fw pi-user-edit', to: '/crud-votantes' },
             ]
         },
             ];
@@ -196,7 +198,7 @@ const App = () => {
                     <Route path="/crud-provincia" component={Crud} />
                     <Route path="/crud-cuidad" component={CrudCuidad} />
                     <Route path="/crud-sexo" component={CrudSexo} />
-                    <Route path="/crud-votante" component={CrudSexo} />
+                    <Route path="/crud-votantes" component={CrudVotantes} />
                 </div>
 
                 <AppFooter layoutColorMode={layoutColorMode} />
