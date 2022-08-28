@@ -9,6 +9,8 @@ import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { VotanteService } from "../service/VotanteService";
 
+
+
 const CrudVotante = () => {
     let emptyProduct = {
         id: null,   
@@ -113,6 +115,7 @@ const CrudVotante = () => {
         setVotante(product);
         setDeleteVotanteDialog(true);
     };
+   
 
     const deleteProduct = () => {
         let _products = votantes.filter((val) => val.id !== votantes.id);
@@ -156,10 +159,10 @@ const CrudVotante = () => {
         });
     };
 
-    const onInputChange = (e, name) => {
+    const onInputChange = (e, nombre) => {
         const val = (e.target && e.target.value) || "";
         let _product = { ...votantes };
-        _product[`${name}`] = val;
+        _product[`${nombre}`] = val;
 
         setVotante(_product);
     };
@@ -279,6 +282,11 @@ const CrudVotante = () => {
         );
     };
 
+                                                                                                                                                                                                                                                                                                                                                                                                                        
+ 
+
+
+
     const header = (
         <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
             <h5 className="m-0">Votante</h5>
@@ -340,6 +348,7 @@ const CrudVotante = () => {
                         <Column field="celular" header="Celular" body={celularBodyTemplate} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
                         <Column field="idGrupo" header="Grupo" body={idGrupoBodyTemplate} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
                         <Column field="idInstitucion" header="Institucion" body={idInstitucionBodyTemplate} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
+               
                         <Column field="idSexo" header="Sexo" body={idSexoBodyTemplate} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
                         <Column field="codigo" header="Codigo" body={codigoBodyTemplate} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
                         <Column body={actionBodyTemplate}></Column>
@@ -362,10 +371,9 @@ const CrudVotante = () => {
                                 })}
                             />
                             {submitted && !votantes.nombre && <small className="p-invalid">El nombre es requerido.</small>}
-                        </div>
-                       
+                      
                                 
-                        <div className="field">
+    
                             <label htmlFor="name">Apellido </label>
                             <InputText
                                 id="apellido"
@@ -378,10 +386,10 @@ const CrudVotante = () => {
                                 })}
                             />
                             {submitted && !votantes.apellido && <small className="p-invalid">El apellido es requerido.</small>}
-                        </div>
+               
                        
                                       
-                        <div className="field">
+                     
                             <label htmlFor="name">cedula </label>
                             <InputText
                                 id="cedula"
@@ -394,10 +402,9 @@ const CrudVotante = () => {
                                 })}
                             />
                             {submitted && !votantes.cedula && <small className="p-invalid">La cedula es requerida.</small>}
-                        </div>
-                       
+                   
                                   
-                        <div className="field">
+                 
                             <label htmlFor="name">Correo </label>
                             <InputText
                                 id="correo"
@@ -410,10 +417,10 @@ const CrudVotante = () => {
                                 })}
                             />
                             {submitted && !votantes.correo && <small className="p-invalid">El correo es requerido.</small>}
-                        </div>
+                        
                        
                                 
-                        <div className="field">
+                      
                             <label htmlFor="name">Celular </label>
                             <InputText
                                 id="celular"
@@ -426,14 +433,10 @@ const CrudVotante = () => {
                                 })}
                             />
                             {submitted && !votantes.celular && <small className="p-invalid">El celular es requerido.</small>}
-                        </div>
-                       
-                 
+                   
 
-
-                    <div className="field">
+             
                             <label htmlFor="name">Instituto </label>
-                            insertar un panel menu
                             <InputText
                                 id="institucion"
                                 value={votante.institucion}
@@ -445,12 +448,8 @@ const CrudVotante = () => {
                                 })}
                             />
                             {submitted && !votantes.institucion && <small className="p-invalid"></small>}
-                        </div>
-                       
-
-
-                    <div className="field">
-                        insertar un panel menu
+                  
+                    
                             <label htmlFor="name">Grupo </label>
                             <InputText
                                 id="grupo"
@@ -463,9 +462,9 @@ const CrudVotante = () => {
                                 })}
                             />
                             {submitted && !votantes.grupo && <small className="p-invalid"></small>}
-                        </div>
                        
-                        <div className="field">
+                       
+                     
                             <label htmlFor="name">CODIGO </label>
                             <InputText
                                 id="codigo"
@@ -478,9 +477,9 @@ const CrudVotante = () => {
                                 })}
                             />
                             {submitted && !votantes.codigo && <small className="p-invalid">El codigo es requerido.</small>}
-                        </div>
+                    
 
-                        <div className="field">
+                   
                             <label htmlFor="name">Activo</label>
                             <InputText
                                 id="isActive"

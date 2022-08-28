@@ -14,6 +14,7 @@ import Crud from './pages/Crud';
 import CrudCuidad from './pages/CrudCuidad'
 import CrudSexo from './pages/CrudSexo';
 import CrudVotantes from './pages/CrudVotantes';
+import CrudCandidato from './pages/CrudCandidato';
 
 import PrimeReact from 'primereact/api';
 import { Tooltip } from 'primereact/tooltip';
@@ -152,6 +153,7 @@ const App = () => {
                 { label: 'Ciudad', icon: 'pi pi-fw pi-user-edit', to: '/crud-cuidad' },
                 { label: 'Sexo', icon: 'pi pi-fw pi-user-edit', to: '/crud-sexo' },
                 { label: 'Votante', icon: 'pi pi-fw pi-user-edit', to: '/crud-votantes' },
+                { label: 'Candidato', icon: 'pi pi-fw pi-user-edit', to: '/crud-candidato' },
             ]
         },
             ];
@@ -199,6 +201,7 @@ const App = () => {
                     <Route path="/crud-cuidad" component={CrudCuidad} />
                     <Route path="/crud-sexo" component={CrudSexo} />
                     <Route path="/crud-votantes" component={CrudVotantes} />
+                    <Route path="/crud-candidato" component={CrudCandidato} />
                 </div>
 
                 <AppFooter layoutColorMode={layoutColorMode} />
