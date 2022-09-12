@@ -10,10 +10,12 @@ import { InputText } from "primereact/inputtext";
 
 import { VotanteService } from "../service/VotanteService";
 import { InstitucionService } from "../service/InstitucionService";
+import { GrupoService } from "../service/GrupoService";
+import { SexoService } from "../service/SexoService";
 
 import { Dropdown } from "primereact/dropdown";
-
-
+import { InputSwitch } from "primereact/inputswitch";
+import { FileUpload } from "primereact/fileupload";
 const CrudVotante = () => {
     let emptyProduct = {
         id: null,   
@@ -21,49 +23,90 @@ const CrudVotante = () => {
         apellido: "",
         cedula: "",
         correo: "",
-        celular: "",     
-        institucion: "",
+        celular: "",  
+        isActive: "",   
+        institucion: null,
         grupo: "",
-        isActive: "",
         sexo: "",
         codigo:"",
     };
 
     const [votantes, setvotantes] = useState(null);
     const [instituciones, setinstituciones] = useState(null);
-    
+    const [grupos, setgrupos] = useState(null);
+    const [sexos, setsexos] = useState(null);
+    const [codigo, setCodigo] = useState("");
+
+
     const [votantesDialog, setVotantesDialog] = useState(false);
     const [deleteVotanteDialog, setDeleteVotanteDialog] = useState(false);
     const [deleteVotantesDialog, setDeleteVotantesDialog] = useState(false);
 
-    const [institucion, setinstitucion] = useState(emptyProduct);
     const [votante, setVotante] = useState(emptyProduct);  
+    const [institucion, setinstitucion] = useState(null);
+    const [grupo, setGrupo] = useState(null);  
+    const [sexo, setSexo] = useState(null); 
+    const [activo, setActivo] = useState(false);
+    const [activeCedula, setActiveCedula] = useState(true);
 
-    const [selectedCand, setSelectedCands] = useState(null);
+
+    const [selectedvotantes, setSelectedvotantes] = useState(null);
 
     const [submitted, setSubmitted] = useState(false);
     const [submittedInstitucion, setSubmittedInstitucion] = useState(false);
+    const [submittedGrupo, setSubmittedGrupo] = useState(false);
+    const [submittedSexo, setSubmittedSexo] = useState(false);
 
     const [globalFilter, setGlobalFilter] = useState(null);
     const toast = useRef(null);
     const dt = useRef(null);
 
+    const data = JSON.parse(window.localStorage.getItem("institucion"));
     useEffect(() => {
-        const votante = new VotanteService();
-   
-votante.getVotante().then((data) => setvotantes(data));
+      /*  const candService = new VotanteService();
+        candService.getVotante().then((data) => setvotantes(data));
 
         const institucion = new InstitucionService();
-        institucion.getInstitucion(setinstituciones);
+        institucion.getInstituciones(setinstituciones)
 
-    }, []);
+        const grupo= new GrupoService();
+        grupo.getGrupos(setgrupos);
 
-    
+        const sexo = new SexoService();
+        sexo.getSexo(setsexos);
+
+    }, []);*/
+
+    if (data) {
+        const votanteService = new VotanteService();
+        votanteService.getVotantes(data.ruc, setvotantes).then((res) => {
+            if (res === 401) {
+                window.localStorage.removeItem("institucion");
+                
+            }
+        });
+        const institucionService = new InstitucionService();
+        institucionService.getInstitucion(data.ruc, setinstitucion);
+        const grupoService = new GrupoService();
+        grupoService.getGrupos(data.ruc, setGrupo);
+        const sexoService = new SexoService();
+        sexoService.getSexos(setSexo);
+    } else {
+        
+    }
+}, []);
+
+
 
     const openNew = () => {
         setVotante(emptyProduct);
         setinstitucion({});
+        setGrupo({});
+        setSexo({});
         setSubmittedInstitucion(false);
+        setSubmittedGrupo(false);
+        setSubmittedSexo(false);
+
         setVotantesDialog(true);
     };
 
@@ -71,6 +114,9 @@ votante.getVotante().then((data) => setvotantes(data));
         setSubmitted(false);
         setSubmittedInstitucion(false);
         setVotantesDialog(false);
+        setSubmittedGrupo(false);
+        setSubmittedSexo(false);
+
       
     };
 
@@ -82,79 +128,81 @@ votante.getVotante().then((data) => setvotantes(data));
         setDeleteVotantesDialog(false);
     };
 
-
-
-    const saveProduct = () => {
+    const saveVotante = () => {
         setSubmitted(true);
-        setSubmittedInstitucion(true);
+
+        const votanteService = new VotanteService();
+        votante.institucion = institucion;
+        votante.activo = activo;
+        votante.grupo = grupo;
+        votante.sexo = sexo;
+        votante.codigo = codigo;
 
         if (votante.nombre.trim()) {
-            votante.institucion=institucion;
-            let _products = [...votantes];
-            let _product = { ...votante };
+            let _votantes = [...votantes];
+            let _votante = { ...votante };
             if (votante.id) {
-                const object = new VotanteService();
-                object.putVotante(votante);
-
+                console.log(votante);
+                votanteService.updateVotante(votante).then((res) => {
+                    if (res === 401) {
+                        window.localStorage.removeItem("institucion");
+                   
+                    }
+                });
                 const index = findIndexById(votante.id);
-                _products[index] = _product;
-          
-                toast.current.show({
-                    severity: "success",
-                    summary: "Successful",
-                    detail: "Product Updated",
-                    life: 3000,
-                });
+                _votantes[index] = _votante;
+                toast.current.show({ severity: "success", summary: "Successful", detail: "votante Updated", life: 3000 });
             } else {
-
-                const votantService=new VotanteService();
-               votantService.postVotante(_product);
-               _products.push(_products);
-             /*   _product.id = createId();
-                  _product.image = "product-placeholder.svg";
-                _products.push(_product);*/
-                
-                toast.current.show({
-                    severity: "success",
-                    summary: "Successful",
-                    detail: "Product Created",
-                    life: 3000,
+                votanteService.postVotante(votante).then((res) => {
+                    if (res === 401) {
+                        window.localStorage.removeItem("institucion");
+                      
+                    }
                 });
+                _votantes.push(_votante);
+                toast.current.show({ severity: "success", summary: "Successful", detail: "votante Created", life: 3000 });
             }
 
-            setVotante(_products);
+            setCodigo("");
+            setvotantes(_votantes);
             setVotantesDialog(false);
             setVotante(emptyProduct);
         }
     };
 
-    const editProduct = (product) => {
-        setvotantes({ ...product });
-        setinstitucion({...votante.institucion});
+    const editProduct = (votante) => {
+        setCodigo(votante.codigo);
+        setActiveCedula(false);
+        setGrupo(votante.grupo);
+        setSexo(votante.sexo);
+        setActivo(votante.activo);
+        setVotante({ ...votante });
         setVotantesDialog(true);
     };
 
-    const confirmDeleteProduct = (product) => {
-        setVotante(product);
+    const confirmDeleteProduct = (votante) => {
+        setVotante(votante);
         setDeleteVotanteDialog(true);
     };
    
 
     const deleteProduct = () => {
-
-        const  voService= new VotanteService();
-        voService.deleteVotante(votantes.id);
-
-        let _products = votantes.filter((val) => val.id !== votantes.id);
-        setVotante(_products);
-        setDeleteVotanteDialog(false);
-        setVotante(emptyProduct);
-        toast.current.show({
-            severity: "success",
-            summary: "Successful",
-            detail: "Product Deleted",
-            life: 3000,
+        const votanteService = new VotanteService();
+        let _votantes;
+        votanteService.deleteVotante(votante.id).then((res) => {
+            if (res === 500) {
+                toast.current.show({ severity: "error", summary: "Error Message", detail: "votante no eliminada", life: 3000 });
+            } else if (res === 401) {
+                
+                window.localStorage.removeItem("institucion");
+            } else {
+                _votantes = votantes.filter((val) => val.id !== votante.id);
+                setvotantes(_votantes);
+                setVotante(emptyProduct);
+                toast.current.show({ severity: "success", summary: "Successful", detail: "votante eliminada", life: 3000 });
+            }
         });
+        setDeleteVotanteDialog(false);
     };
 
     const findIndexById = (id) => {
@@ -169,18 +217,33 @@ votante.getVotante().then((data) => setvotantes(data));
         return index;
     };
 
+    const exportCSV = () => {
+        dt.current.exportCSV();
+    };
+
+    const confirmDeleteSelected = () => {
+        setDeleteVotantesDialog(true);
+    };
 
     const deleteSelectedProducts = () => {
-        let _products = votantes.filter((val) => !selectedCand.includes(val));
-        setDeleteVotanteDialog(_products);
-        setDeleteVotanteDialog(false);
-        setSelectedCands(null);
-        toast.current.show({
-            severity: "success",
-            summary: "Successful",
-            detail: "Products Deleted",
-            life: 3000,
-        });
+        const votanteService = new VotanteService();
+        let _votantes;
+        selectedvotantes.map((res) =>
+            votanteService.deleteVotante(res.id).then((res) => {
+                if (res === 500) {
+                    toast.current.show({ severity: "error", summary: "Error Message", detail: "votantes no eliminadas", life: 3000 });
+                } else if (res === 401) {
+                    window.localStorage.removeItem("institucion");
+                   
+                } else {
+                    _votantes = votantes.filter((val) => !selectedvotantes.includes(val));
+                    setvotantes(_votantes);
+                    setSelectedvotantes(null);
+                    toast.current.show({ severity: "success", summary: "Successful", detail: "votantes eliminadas", life: 3000 });
+                }
+            })
+        );
+        setDeleteVotantesDialog(false);
     };
 
     const onInputChange = (e, nombre) => {
@@ -198,10 +261,22 @@ votante.getVotante().then((data) => setvotantes(data));
             <React.Fragment>
                 <div className="my-2">
                     <Button label="Nuevo" icon="pi pi-plus" className="p-button-success mr-2" onClick={openNew} />
+                    <Button label="Delete" icon="pi pi-trash" className="p-button-danger" onClick={confirmDeleteSelected} disabled={!selectedvotantes || !selectedvotantes.length} />
                 </div>
             </React.Fragment>
         );
     };
+
+
+    const rightToolbarTemplate = () => {
+        return (
+            <React.Fragment>
+                <FileUpload mode="basic" accept="image/*" maxFileSize={1000000} label="Import" chooseLabel="Import" className="mr-2 inline-block" />
+                <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} />
+            </React.Fragment>
+        );
+    };
+
 
     const idBodyTemplate = (rowData) => {
         return (
@@ -262,29 +337,29 @@ votante.getVotante().then((data) => setvotantes(data));
         return (
             <>
                 <span className="p-column-title">institucion</span>
-                {rowData.institucion.nombre}
+                {rowData.institucion.institucion}
             </>
         );
     };
 
-    const idGrupoBodyTemplate = (rowData) => {
+    const grupoBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">group</span>
-                {rowData.grupo.nombre}
+                <span className="p-column-title">grupo</span>
+                {rowData.grupo.grupo}
             </>
         );
     };
-
-
-    const idSexoBodyTemplate = (rowData) => {
+    const sexoBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Sex</span>
-                {rowData.sexo.nombre}
+                <span className="p-column-title">sexo</span>
+                {rowData.sexo.sexo}
             </>
         );
     };
+
+
     const codigoBodyTemplate = (rowData) => {
         return (
             <>
@@ -293,6 +368,13 @@ votante.getVotante().then((data) => setvotantes(data));
             </>
         );
     };
+
+
+    const handleCodigo = (e) => {
+        const votanteService = new VotanteService();
+        votanteService.getCodigo(institucion.id).then((res) => setCodigo(res));
+    };
+
 
 
     const actionBodyTemplate = (rowData) => {
@@ -304,9 +386,22 @@ votante.getVotante().then((data) => setvotantes(data));
         );
     };
 
+    const onInstitucionChange = (e) => {
+        setinstitucion(e.value);
+    };
+
+    const onGrupoChange = (e) => {
+        setgrupos(e.value);
+    };
+
+    const onSexoChange = (e) => {
+        setsexos(e.value);
+    };
+
+
     const header = (
         <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-            <h5 className="m-0">Votante</h5>
+            <h5 className="m-0">Votantes</h5>
             <span className="block mt-2 md:mt-0 p-input-icon-left">
                 <i className="pi pi-search" />
                 <InputText type="search" onInput={(e) => setGlobalFilter(e.target.value)} placeholder="Buscar..." />
@@ -317,7 +412,7 @@ votante.getVotante().then((data) => setvotantes(data));
     const productDialogFooter = (
         <>
             <Button label="Cancelar" icon="pi pi-times" className="p-button-text" onClick={hideDialog} />
-            <Button label="Guardar" icon="pi pi-check" className="p-button-text" onClick={saveProduct} />
+            <Button label="Guardar" icon="pi pi-check" className="p-button-text" onClick={saveVotante} />
         </>
     );
     const deleteProductDialogFooter = (
@@ -333,22 +428,20 @@ votante.getVotante().then((data) => setvotantes(data));
         </>
     );
 
-    const onInstitucionChange = (e) => {
-        setinstitucion(e.value);
-    };
+
 
     return (
         <div className="grid crud-demo">
             <div className="col-12">
                 <div className="card">
                     <Toast ref={toast} />
-                    <Toolbar className="mb-4" left={leftToolbarTemplate}></Toolbar>
+                    <Toolbar className="mb-4" left={leftToolbarTemplate}>right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
                         ref={dt}
                         value={votantes}
-                        selection={selectedCand}
-                        onSelectionChange={(e) => setSelectedCands(e.value)}
+                        selection={selectedvotantes}
+                        onSelectionChange={(e) => setSelectedvotantes(e.value)}
                         dataKey="id"
                         paginator
                         rows={10}
@@ -367,10 +460,10 @@ votante.getVotante().then((data) => setvotantes(data));
                         <Column field="cedula" header="Cedula" body={cedulaBodyTemplate} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
                         <Column field="correo" header="Correo" body={correoBodyTemplate} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
                         <Column field="celular" header="Celular" body={celularBodyTemplate} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
-                        <Column field="idGrupo" header="Grupo" body={idGrupoBodyTemplate} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
-                        <Column field="idInstitucion" header="Institucion" body={institucionBodyTemplate} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
+                        <Column field="grupo" header="Grupo" body={grupoBodyTemplate} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
+                        <Column field="institucion" header="Institucion" body={institucionBodyTemplate} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
                
-                        <Column field="idSexo" header="Sexo" body={idSexoBodyTemplate} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
+                        <Column field="sexo" header="Sexo" body={sexoBodyTemplate} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
                         <Column field="codigo" header="Codigo" body={codigoBodyTemplate} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
                         <Column body={actionBodyTemplate}></Column>
                     </DataTable> 
@@ -440,48 +533,34 @@ votante.getVotante().then((data) => setvotantes(data));
                                 })}
                             />
                             {submitted && !votantes.celular && <small className="p-invalid">El celular es requerido.</small>}
-                             <label htmlFor="name">Grupo </label>
-                            <InputText
-                                id="grupo"
-                                value={votante.grupo}
-                                onChange={(e) => onInputChange(e, "grupo")}
-                                required
-                                autoFocus
-                                className={classNames({
-                                    "p-invalid": submitted && !votantes.grupo
-                                })}
-                            />
-                            {submitted && !votantes.grupo && <small className="p-invalid"></small>}        
-                            <label htmlFor="name">CODIGO </label>
-                            <InputText
-                                id="codigo"
-                                value={votante.codigo}
-                                onChange={(e) => onInputChange(e, "codigo")}
-                                required
-                                autoFocus
-                                className={classNames({
-                                    "p-invalid": submitted && !votantes.codigo
-                                })}
-                            />
-                            {submitted && !votantes.codigo && <small className="p-invalid">El codigo es requerido.</small>}
-                            <label htmlFor="name">Activo</label>
-                            <InputText
-                                id="isActive"
-                                value={votante.isActive}
-                                onChange={(e) => onInputChange(e, "isActive")}
-                                required
-                                autoFocus
-                                className={classNames({
-                                    "p-invalid": submitted && !votantes.isActive
-                                })}
-                            />
-                            {submitted && !votantes.isActive && <small className="p-invalid">.....</small>}
+                            
+                            <div className="field ">
+                            <label htmlFor="codigo">Codigo--</label>
+                            <label htmlFor="codigo">{codigo}</label>
+                            <Button label="Gemerar codigo" icon="pi pi-plus" className="p-button-success mr-2" onClick={handleCodigo} />
                         </div>
-                        <div>
-                            <Dropdown id="name" value={institucion} required options={instituciones} onChange={onInstitucionChange} optionLabel="nombre" placeholder="Select a City" className={classNames({ "p-invalid": submittedInstitucion && !institucion.nombre })} />
-                            {submittedInstitucion && !institucion.nombre && <small className="p-invalid">Se requiere un nombre </small>}
+                        <div className="field">
+                            <InputSwitch checked={activo} onChange={(e) => setActivo(e.value)} color="primary" name="status" />
+                        </div>
+
+                            <Dropdown id="name"value={institucion} required options={instituciones} onChange={onInstitucionChange} optionLabel="nombre" placeholder="Selecione la institucion" className={classNames({ "p-invalid": submittedInstitucion && !institucion.nombre })} />
+                            {submittedInstitucion && !institucion.nombre && <small className="p-invalid">Es requerido</small>}
                          </div>
+                         <p/>        
+                         <div>
+                            <Dropdown id="name" value={grupo} required options={grupos} onChange={onGrupoChange} optionLabel="nombre" placeholder="Selecione un grupo" className={classNames({ "p-invalid": submittedInstitucion && !grupo.nombre })} />
+                            {submittedGrupo && !grupo.nombre && <small className="p-invalid">Es requerido </small>}
+                         </div>
+
+                         <p/>        
+                         <div>
+                            <Dropdown id="name" value={sexo} required options={sexos} onChange={onSexoChange} optionLabel="nombre" placeholder="Selecione un sexo" className={classNames({ "p-invalid": submittedSexo && !sexo.nombre })} />
+                            {submittedSexo && !sexo.nombre && <small className="p-invalid">Es requerido </small>}
+                         </div>
+
+
                     </Dialog>
+
                  <Dialog visible={deleteVotanteDialog} style={{ width: "450px" }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: "2rem" }} />

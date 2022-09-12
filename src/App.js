@@ -18,6 +18,7 @@ import CrudCandidato from './pages/CrudCandidato';
 
 import PrimeReact from 'primereact/api';
 import { Tooltip } from 'primereact/tooltip';
+import { InstitucionService } from "./service/InstitucionService";
 
 import 'primereact/resources/primereact.css';
 import 'primeicons/primeicons.css';
@@ -30,6 +31,7 @@ import './App.scss';
 
 
 const App = () => {
+    const [instituto, setInstituto] = useState({});
     const [layoutMode, setLayoutMode] = useState('static');
     const [layoutColorMode, setLayoutColorMode] = useState('light')
     const [inputStyle, setInputStyle] = useState('outlined');
@@ -45,6 +47,12 @@ const App = () => {
 
     let menuClick = false;
     let mobileTopbarMenuClick = false;
+
+
+    useEffect(() => {
+        const institucion = new InstitucionService();
+        institucion.getInstituciones("ruc", setInstituto);
+    }, []);
 
     useEffect(() => {
         if (mobileMenuActive) {
